@@ -25,17 +25,20 @@ h1{margin:0;font-size:clamp(20px,4vw,27px);line-height:1.35}p{margin:8px 0 0;col
 </head>
 <body>
 <main id="loading-screen" class="loading-screen" aria-live="polite"><section class="loading-card"><div class="seal" aria-hidden="true"></div><h1>Dashboard KPI อบจ.สมุทรสาคร</h1><p id="loading-message">กำลังเชื่อมต่อระบบ กรุณารอสักครู่</p><div class="progress" aria-hidden="true"></div><div id="fallback" class="fallback"><p>หากระบบไม่แสดง สามารถเปิด Web App โดยตรงได้</p><a id="direct-link" href="#" target="_blank" rel="noopener noreferrer">เปิดระบบโดยตรง</a></div></section></main>
-<iframe id="dashboard-frame" class="app-frame" title="ระบบ Dashboard KPI อบจ.สมุทรสาคร" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-downloads allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" allow="fullscreen" allowfullscreen></iframe>
+<iframe id="dashboard-frame" class="app-frame" title="ระบบ Dashboard KPI อบจ.สมุทรสาคร" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-downloads allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
 <noscript><div style="position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:24px;color:#fff;background:#062d1d;text-align:center">กรุณาเปิดใช้งาน JavaScript เพื่อเข้าสู่ระบบ Dashboard</div></noscript>
 <script>
 (()=>{'use strict';
 const APP_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxr14wuFfaLZuEKsExgVOy2C17-NiDsaB5YtJIZmoPe3jd2zm0vJf6ItmVAmYZcbgjH/exec';
 const frame=document.getElementById('dashboard-frame'),screen=document.getElementById('loading-screen'),message=document.getElementById('loading-message'),fallback=document.getElementById('fallback'),directLink=document.getElementById('direct-link');
-function trustedUrl(){try{const url=new URL(APP_SCRIPT_URL),valid=/^\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(url.pathname);if(url.protocol!=='https:'||url.hostname!=='script.google.com'||!valid)return'';url.searchParams.set('host','github-pages');return url.href}catch(error){return''}}
+function trustedUrl(){try{const url=new URL(APP_SCRIPT_URL),valid=/^\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(url.pathname);if(url.protocol!=='https:'||url.hostname!=='script.google.com'||!valid)return'';url.searchParams.set('host','github-pages');if(new URLSearchParams(location.search).get('analyticsTest')==='1')url.searchParams.set('analyticsTest','1');return url.href}catch(error){return''}}
 const url=trustedUrl();directLink.href=APP_SCRIPT_URL;
 if(!url){message.textContent='การตั้งค่า Web App URL ไม่ถูกต้อง';fallback.classList.add('is-visible');return}
-frame.addEventListener('load',()=>{frame.classList.add('is-ready');screen.classList.add('is-hidden')},{once:true});
-window.setTimeout(()=>{if(!frame.classList.contains('is-ready')){message.textContent='การเชื่อมต่อใช้เวลานานกว่าปกติ';fallback.classList.add('is-visible')}},12000);
+let ready=false;
+function showApp(){if(ready)return;ready=true;frame.classList.add('is-ready');screen.classList.add('is-hidden')}
+window.addEventListener('message',event=>{const trusted=/^https:\/\/(?:script\.google\.com|[a-z0-9.-]+\.googleusercontent\.com)$/.test(event.origin);if(trusted&&event.data&&event.data.type==='sk-dashboard-ready')showApp()});
+frame.addEventListener('load',()=>{window.setTimeout(showApp,2500)},{once:true});
+window.setTimeout(()=>{if(!ready){message.textContent='การเชื่อมต่อใช้เวลานานกว่าปกติ';fallback.classList.add('is-visible')}},12000);
 frame.src=url;
 })();
 </script>
